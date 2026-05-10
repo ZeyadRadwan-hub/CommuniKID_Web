@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيانات البطل | CommuniKID</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body settings-page">
+
+    <div class="global-controls">
+        <button id="themeToggle" class="control-btn">🌙</button>
+        <button id="langToggle" class="control-btn">EN</button>
+    </div>
+
+    <header class="settings-header" style="margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <h1>بيانات البطل 👤<br><span style="font-size: 0.9rem; font-weight: normal; opacity: 0.7;">تحديث المعلومات الأساسية</span></h1>
+        <a href="settings.html" class="control-btn" style="text-decoration: none;" data-i18n="back">⬅️ رجوع</a>
+    </header>
+
+    <div class="auth-container" style="margin: 0 auto;">
+        <div class="auth-box">
+            <form id="heroDataForm">
+                <div class="input-group">
+                    <label>الاسم بالكامل</label>
+                    <input type="text" id="heroNameInput" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>عمر البطل (بالسنوات)</label>
+                    <input type="number" id="heroAgeInput" required min="1" max="18">
+                </div>
+
+                <div class="input-group">
+                    <label>حالة البطل</label>
+                    <select id="heroConditionInput" required>
+                        <option value="speech_delay">تأخر في النطق</option>
+                        <option value="autism">طيف توحد</option>
+                        <option value="down_syndrome">متلازمة داون</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                    <label style="color: var(--primary-color);">كود الأخصائي المعالج (لربط الحساب)</label>
+                    <input type="text" id="heroDoctorCodeInput" placeholder="أدخل كود الأخصائي (مثال: ABCD1234@)">
+                    <small style="color: #888; font-size: 0.8rem; display: block; margin-top: 5px;">احصل على الكود من الأخصائي لربط حساب البطل وتلقي المهام والمواعيد.</small>
+                </div>
+
+                <button type="submit" class="primary-btn" style="margin-top: 15px;">حفظ التعديلات ✅</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/global.js"></script>
+    <script src="js/hero-data.js"></script>
+</body>
+</html>
