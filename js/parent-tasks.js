@@ -16,12 +16,48 @@ document.addEventListener('DOMContentLoaded', function() {
     // دالة نطق الجملة
     window.playTaskSound = function(text) {
         const currentLang = localStorage.getItem('app_lang') || 'ar';
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
-        speechSynthesis.speak(utterance);
+        const targetLangCode = currentLang === 'ar' ? 'ar' : 'en';
+
+        const executeSpeech = () => {
+            const voices = speechSynthesis.getVoices();
+            let selectedVoice = null;
+
+            if (targetLangCode === 'ar') {
+                selectedVoice = voices.find(voice => voice.lang.includes('ar'));
+            } else {
+                selectedVoice = voices.find(voice => voice.lang.includes('en'));
+            }
+
+            if (selectedVoice) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = selectedVoice;
+                utterance.lang = selectedVoice.lang;
+                speechSynthesis.speak(utterance);
+            } else {
+                // Fallback to Cloud TTS API if local voice not found
+                const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${targetLangCode}&q=${encodeURIComponent(text)}`;
+                const audio = new Audio(fallbackUrl);
+                audio.play().catch(e => console.error("Fallback TTS failed:", e));
+            }
+        };
+
+        if (speechSynthesis.getVoices().length === 0) {
+            const voicesChangedHandler = () => {
+                speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+                executeSpeech();
+            };
+            speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+            
+            setTimeout(() => {
+                speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+                executeSpeech();
+            }, 1000);
+        } else {
+            executeSpeech();
+        }
     };
 
-    function loadParentTasks() {
+    async function loadParentTasks() {
         let tasksString = localStorage.getItem('all_tasks');
         let allTasks = [];
         if (tasksString !== null) {
@@ -34,13 +70,17 @@ document.addEventListener('DOMContentLoaded', function() {
         let hasPending = false;
         let hasCompleted = false;
 
-        allTasks.forEach(function(task, index) {
+        for (let index = 0; index < allTasks.length; index++) {
+            const task = allTasks[index];
             if (task.patientEmail === currentUser.email) {
+                let displayContent = task.content;
+                let displayType = task.type || '';
+
                 let completedClass = task.done ? 'completed' : '';
                 let actionHtml = "";
                 
                 if (task.done) {
-                    actionHtml = `<span class="task-done-badge">تم الإنجاز ✅</span>`;
+                    actionHtml = `<span class="task-done-badge" data-dynamic-translate>تم الإنجاز ✅</span>`;
                 } else {
                     // الزراير المربعة الجديدة (صوت + مايك) بدون إنجاز يدوياً
                     actionHtml = `
@@ -55,8 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cardHTML = `
                     <div class="parent-task-card ${completedClass}">
                         <div class="task-info">
-                            <h3>${task.content}</h3>
-                            <p>نوع التدريب: ${task.type} | تاريخ الإرسال: ${task.date}</p>
+                            <h3 data-dynamic-translate data-translate-safe="true">${displayContent}</h3>
+                            <p><span data-i18n="task_type">نوع التدريب</span>: <span data-dynamic-translate data-translate-safe="true">${displayType}</span> | <span data-i18n="date_label">تاريخ الإرسال</span>: ${task.date || ''}</p>
                         </div>
                         <div>
                             ${actionHtml}
@@ -72,13 +112,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     hasPending = true;
                 }
             }
-        });
+        }
 
         if (hasPending === false) {
-            pendingContainer.innerHTML = '<p style="text-align:center; color:#888;">أنت بطل! لا توجد مهام معلقة حالياً 🌟</p>';
+            pendingContainer.innerHTML = '<p style="text-align:center; color:#888;" data-dynamic-translate data-translate-safe="true">أنت بطل! لا توجد مهام معلقة حالياً 🌟</p>';
         }
         if (hasCompleted === false) {
-            completedContainer.innerHTML = '<p style="text-align:center; color:#888;">لم تنجز أي مهام بعد، هيا نبدأ! 💪</p>';
+            completedContainer.innerHTML = '<p style="text-align:center; color:#888;" data-dynamic-translate data-translate-safe="true">لم تنجز أي مهام بعد، هيا نبدأ! 💪</p>';
         }
     }
 

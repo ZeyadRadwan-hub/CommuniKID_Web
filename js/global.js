@@ -6,7 +6,7 @@ const translations = {
         // نصوص Login
         welcome_title_login: "كوميوني-كيد 🚀", welcome_subtitle_login: "مرحباً بعودتك يا بطل!", login_btn: "تسجيل الدخول السريع", new_user: "أول مرة هنا؟", create_account_link: "أنشئ حساباً جديداً",
         // نصوص Signup
-        welcome_title_signup: "انضم لعالمنا 🌟", welcome_subtitle_signup: "اختر نوع حسابك لنبدأ الرحلة", role_parent: "👨‍👩‍👦 ولي أمر", role_therapist: "👨‍⚕️ أخصائي", fullname_label: "الاسم بالكامل", fullname_placeholder: "أدخل اسمك", child_age_label: "سن الطفل", child_age_placeholder: "عمر الطفل بالسنوات", child_condition_label: "حالة البطل", cond_speech: "تأخر في النطق", cond_autism: "طيف توحد", specialty_label: "التخصص الدقيق", specialty_placeholder: "مثال: أخصائي تخاطب، تعديل سلوك", gender_label: "النوع", gender_male: "ذكر", gender_female: "أنثى", signup_btn: "إنشاء الحساب الآن", have_account: "لديك حساب بالفعل؟", login_link: "تسجيل الدخول", email_label: "البريد الإلكتروني", email_placeholder: "أدخل بريدك الإلكتروني", password_label: "كلمة المرور", password_placeholder: "أدخل كلمة المرور",
+        welcome_title_signup: "انضم لعالمنا 🌟", welcome_subtitle_signup: "اختر نوع حسابك لنبدأ الرحلة", role_parent: "👨‍👩‍👦 ولي أمر", role_therapist: "👨‍⚕️ أخصائي", fullname_label: "الاسم بالكامل", fullname_placeholder: "أدخل اسمك", child_age_label: "سن الطفل", child_age_placeholder: "عمر الطفل بالسنوات", child_condition_label: "حالة البطل", cond_speech: "تأخر في النطق", cond_autism: "طيف توحد", specialty_label: "التخصص الدقيق", specialty_placeholder: "مثال: أخصائي تخاطب، تعديل سلوك", gender_label: "النوع", gender_male: "ذكر", gender_female: "أنثى", signup_btn: "إنشاء الحساب الآن", have_account: "لديك حساب بالفعل؟", login_link: "تسجيل الدخول", email_label: "البريد الإلكتروني", email_placeholder: "أدخل بريدك الإلكتروني", password_label: "كلمة المرور", password_placeholder: "أدخل كلمة المرور", doctor_code_label: "كود الأخصائي المعالج (اختياري)", doctor_code_placeholder: "أدخل كود الأخصائي لربط الحساب",
         // Navbar & General
         back: "⬅️ رجوع", home_back: "⬅️ العودة للرئيسية", logout: "تسجيل الخروج 🚪", points: "نقطة", market: "🛒 الماركت", settings: "⚙️ الإعدادات", add_word: "➕ إضافة كلمة",
         // Parent Home
@@ -48,7 +48,7 @@ const translations = {
         // Login Texts
         welcome_title_login: "CommuniKID 🚀", welcome_subtitle_login: "Welcome back, Hero!", login_btn: "Quick Login", new_user: "First time here?", create_account_link: "Create a new account",
         // Signup Texts
-        welcome_title_signup: "Join Our World 🌟", welcome_subtitle_signup: "Choose your account type to start", role_parent: "👨‍👩‍👦 Parent", role_therapist: "👨‍⚕️ Therapist", fullname_label: "Full Name", fullname_placeholder: "Enter your name", child_age_label: "Child's Age", child_age_placeholder: "Age in years", child_condition_label: "Hero's Condition", cond_speech: "Speech Delay", cond_autism: "Autism Spectrum", specialty_label: "Specialty", specialty_placeholder: "e.g., Speech Therapist", gender_label: "Gender", gender_male: "Male", gender_female: "Female", signup_btn: "Create Account Now", have_account: "Already have an account?", login_link: "Login", email_label: "Email Address", email_placeholder: "Enter your email", password_label: "Password", password_placeholder: "Enter your password",
+        welcome_title_signup: "Join Our World 🌟", welcome_subtitle_signup: "Choose your account type to start", role_parent: "👨‍👩‍👦 Parent", role_therapist: "👨‍⚕️ Therapist", fullname_label: "Full Name", fullname_placeholder: "Enter your name", child_age_label: "Child's Age", child_age_placeholder: "Age in years", child_condition_label: "Hero's Condition", cond_speech: "Speech Delay", cond_autism: "Autism Spectrum", specialty_label: "Specialty", specialty_placeholder: "e.g., Speech Therapist", gender_label: "Gender", gender_male: "Male", gender_female: "Female", signup_btn: "Create Account Now", have_account: "Already have an account?", login_link: "Login", email_label: "Email Address", email_placeholder: "Enter your email", password_label: "Password", password_placeholder: "Enter your password", doctor_code_label: "Therapist Code (Optional)", doctor_code_placeholder: "Enter therapist code to link account",
         // Navbar & General
         back: "⬅️ Back", home_back: "⬅️ Back Home", logout: "Logout 🚪", points: "Points", market: "🛒 Market", settings: "⚙️ Settings", add_word: "➕ Add Word",
         // Parent Home
@@ -116,6 +116,7 @@ function applyLanguage(lang) {
     localStorage.setItem('app_lang', lang);
     if(window.renderParentHome) renderParentHome(); 
     if(window.renderShop) renderShop(); 
+    if(window.translateAllDynamic) window.translateAllDynamic();
 }
 
 if (langToggleBtn) {
@@ -147,6 +148,127 @@ if (themeToggleBtn) {
     });
 }
 
+// إضافة دالة الترجمة الديناميكية مع نظام كاش (Cache)
+window.translationCache = JSON.parse(localStorage.getItem('translationCache') || '{}');
+
+window.translateDynamicText = async function(text, targetLang) {
+    if (!text) return "";
+    const isArabic = /[\u0600-\u06FF]/.test(text);
+    const sourceLang = isArabic ? 'ar' : 'en';
+    
+    if (sourceLang === targetLang) return text;
+
+    const cacheKey = `${text}_${sourceLang}_${targetLang}`;
+    if (window.translationCache[cacheKey]) {
+        return window.translationCache[cacheKey];
+    }
+
+    try {
+        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`);
+        const data = await response.json();
+        if (data && data.responseData && data.responseData.translatedText) {
+            let translated = data.responseData.translatedText;
+            window.translationCache[cacheKey] = translated;
+            localStorage.setItem('translationCache', JSON.stringify(window.translationCache));
+            return translated;
+        }
+        return text;
+    } catch (e) {
+        console.error("Translation API error:", e);
+        return text;
+    }
+};
+
+window.autoTagMissingTranslations = function() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    const nodesToWrap = [];
+    let node;
+    while (node = walker.nextNode()) {
+        const text = node.nodeValue.trim();
+        if (text.length > 0 && /[\u0600-\u06FF]/.test(text)) {
+            const parent = node.parentElement;
+            if (parent && parent.tagName !== 'SCRIPT' && parent.tagName !== 'STYLE' && parent.tagName !== 'NOSCRIPT') {
+                if (!parent.closest('[data-i18n]') && !parent.closest('[data-dynamic-translate]')) {
+                    nodesToWrap.push(node);
+                }
+            }
+        }
+    }
+    
+    nodesToWrap.forEach(node => {
+        const span = document.createElement('span');
+        span.setAttribute('data-dynamic-translate', '');
+        span.setAttribute('data-translate-safe', 'true');
+        span.textContent = node.nodeValue;
+        if (node.parentNode) {
+            node.parentNode.replaceChild(span, node);
+        }
+    });
+
+    document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+        const text = el.getAttribute('placeholder').trim();
+        if (text && /[\u0600-\u06FF]/.test(text)) {
+            if (!el.hasAttribute('data-i18n-placeholder') && !el.hasAttribute('data-dynamic-translate-placeholder')) {
+                el.setAttribute('data-dynamic-translate-placeholder', '');
+                el.setAttribute('data-original-placeholder', text);
+            }
+        }
+    });
+};
+
+window.translateAllDynamic = async function() {
+    const lang = localStorage.getItem('app_lang') || 'ar';
+    
+    const elements = document.querySelectorAll('[data-dynamic-translate]');
+    for (const el of elements) {
+        let originalText = el.getAttribute('data-original-text');
+        if (!originalText) {
+            originalText = el.textContent.trim();
+            el.setAttribute('data-original-text', originalText);
+        }
+        if (originalText) {
+            const translated = await window.translateDynamicText(originalText, lang);
+            if (el.children.length === 0 || el.getAttribute('data-translate-safe') === 'true') {
+                el.textContent = translated;
+            }
+        }
+    }
+
+    const placeholders = document.querySelectorAll('[data-dynamic-translate-placeholder]');
+    for (const el of placeholders) {
+        let originalText = el.getAttribute('data-original-placeholder');
+        if (originalText) {
+            const translated = await window.translateDynamicText(originalText, lang);
+            el.placeholder = translated;
+        }
+    }
+};
+
+let dynamicTranslateTimeout;
+const dynamicObserver = new MutationObserver((mutations) => {
+    let shouldTranslate = false;
+    for (const m of mutations) {
+        if (m.addedNodes.length > 0) {
+             m.addedNodes.forEach(node => {
+                 if (node.nodeType === 1 || node.nodeType === 3) {
+                     shouldTranslate = true;
+                 }
+             });
+        }
+    }
+    if (shouldTranslate) {
+        clearTimeout(dynamicTranslateTimeout);
+        dynamicTranslateTimeout = setTimeout(() => {
+            if (window.autoTagMissingTranslations) window.autoTagMissingTranslations();
+            if (window.translateAllDynamic) window.translateAllDynamic();
+        }, 300);
+    }
+});
+dynamicObserver.observe(document.body, { childList: true, subtree: true });
+
 // تشغيل الإعدادات فوراً
-applyLanguage(currentLang);
-applyTheme(currentTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.autoTagMissingTranslations) window.autoTagMissingTranslations();
+    applyLanguage(currentLang);
+    applyTheme(currentTheme);
+});

@@ -37,19 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tableBody) {
         tableBody.innerHTML = '';
         if(myPatients.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">لا يوجد نشاط مسجل حتى الآن.</td></tr>`;
+            let msg = 'لا يوجد نشاط مسجل حتى الآن.';
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;" data-dynamic-translate data-translate-safe="true">${msg}</td></tr>`;
         } else {
             myPatients.forEach(p => {
                 let pts = p.points || 0;
                 let status = pts > 200 ? "ممتاز" : (pts > 50 ? "جيد" : "يحتاج متابعة");
                 let statusClass = pts > 200 ? "status-good" : (pts > 50 ? "status-warning" : "status-danger");
                 
+                let trackingLabel = "جاري التتبع";
+                
                 tableBody.innerHTML += `
                     <tr>
-                        <td style="font-weight: bold;">${p.name}</td>
+                        <td style="font-weight: bold;" data-dynamic-translate data-translate-safe="true">${p.name}</td>
                         <td style="color: #f1c40f; font-weight: bold;">⭐ ${pts}</td>
-                        <td style="color:#888;">جاري التتبع</td>
-                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td style="color:#888;" data-dynamic-translate data-translate-safe="true">${trackingLabel}</td>
+                        <td><span class="status-badge ${statusClass}" data-dynamic-translate data-translate-safe="true">${status}</span></td>
                     </tr>
                 `;
             });
@@ -79,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 let color = session.type.includes('أونلاين') ? '#8e44ad' : '#2ecc71';
                 sessionsList.innerHTML += `
                     <div style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; border-right: 4px solid ${color};">
-                        <h4 style="margin: 0 0 5px 0; color: var(--text-color);">${session.patient}</h4>
+                        <h4 style="margin: 0 0 5px 0; color: var(--text-color);" data-dynamic-translate data-translate-safe="true">${session.patient}</h4>
                         <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #888;">
                             <span>🕒 ${session.time}</span>
-                            <span style="color: ${color}; font-weight:bold;">${session.type}</span>
+                            <span style="color: ${color}; font-weight:bold;" data-dynamic-translate data-translate-safe="true">${session.type}</span>
                         </div>
                     </div>
                 `;

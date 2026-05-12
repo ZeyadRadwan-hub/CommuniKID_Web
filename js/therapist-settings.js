@@ -41,14 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const newSpecialty = document.getElementById('docSpecialty').value;
         const newPass = document.getElementById('docPass').value;
 
-        // تحديث الداتا
         currentUser.name = newName;
         currentUser.specialty = newSpecialty;
         if (newPass.trim() !== "") {
             currentUser.password = newPass;
         }
 
-        // حفظ في الـ LocalStorage
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
 
@@ -56,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.reload();
     });
 
-    // زر الخروج
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('currentUser');
         window.location.href = 'login.html';
